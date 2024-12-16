@@ -12,74 +12,51 @@ def main():
 
     body = """
 
-    def process_scans(cur, phi):
-    
-    #Process the SQL table in multiple scans based on the values of the phi operator.
+    S = input("Enter elements separated by commas: ").split(',')
+    S = [col.strip() for col in S]
+    print(S)  
 
-    #:param cur: Cursor for the connected SQL table.
-    #:param phi: Dictionary containing the phi operator values.
-    #:return: H table populated with results after all scans.
-    
-    # Initialize the H table
-    h_table = defaultdict(lambda: {'grouping_values': {}, 'aggregates': defaultdict(float)})
+    #n = int(input("Enter number of grouping variables:"))
+    #print(n)
 
-    # Perform the scans
-    n_scans = phi['N']  # Number of grouping variables determines the number of scans
-    for scan_idx in range(n_scans + 1):  # +1 for the initial scan
-        print(f"Scan {scan_idx + 1}:")
-        cur.execute("SELECT * FROM sales")  # Fetch all rows from the table
+    #V = input("Enter group by attributes:")
+    #V = V.split(',')  
+    #print(V)
+
+    #F = input("Enter aggregate functions")
+    #F = F.split(',')  
+    #print(F)  
+
+    #sig = input("Enter Such that phrases")
+    #sig = sig.split(',')  
+    #print(sig)  
+
+    #G = input("Enter having clause phrases or enter none if you dont have any: ")
+    #G = G.split(',')  
+    #print(G)  
+    
+ # Construct the dynamic SQL query
+    column_string = ", ".join(S)  # Format as "col1, col2, col3"
+    query_string = f"SELECT {column_string} FROM sales"
+
+    try:
+        # Execute the query
+        cur.execute(query_string)
         rows = cur.fetchall()
 
-        # Initial scan: Populate grouping values based on 'S'
-        if scan_idx == 0:
-            for row in rows:
-                key = tuple(row[col] for col in phi['S'] if col in row)
-                if key not in h_table:
-                    h_table[key]['grouping_values'] = {col: row[col] for col in phi['S'] if col in row}
-                    # Set aggregate columns as empty initially
-                    for func in phi['F']:
-                        h_table[key]['aggregates'][func] = None
-            print(f"H Table after scan {scan_idx + 1}:")
-            print(tabulate(
-                [{**{'Group': key}, **h_table[key]['grouping_values']} for key in h_table],
-                headers="keys", tablefmt="psql"
-            ))
-        # Aggregate scan: Populate aggregate values based on conditions in sigma
-        else:
-            sigma = phi['sigma'][scan_idx - 1]
-            for row in rows:
-                for key, entry in h_table.items():
-                    # Evaluate the sigma condition
-                    if eval(sigma, {}, {**row, **entry['grouping_values']}):
-                        # Update aggregates
-                        for func in phi['F']:
-                            if func.startswith("sum"):
-                                col = func.split("(")[1].split(")")[0]  # Extract column name
-                                entry['aggregates'][func] = entry['aggregates'].get(func, 0) + row[col]
-                            elif func.startswith("avg"):
-                                col = func.split("(")[1].split(")")[0]
-                                entry['aggregates'][func] = entry['aggregates'].get(func, 0) + row[col]
-                            # Extend with min, max, count as needed
-            print(f"H Table after scan {scan_idx + 1}:")
-            print(tabulate(
-                [{**{'Group': key}, **entry['grouping_values'], **entry['aggregates']} for key, entry in h_table.items()],
-                headers="keys", tablefmt="psql"
-            ))
+        # Store all rows in _global
+        _global.extend(rows)
 
-    return h_table
+    except psycopg2.Error as e:
+        print("An error occurred while executing the query:", e)
+
+    finally:
+        # Ensure the cursor and connection are closed
+        cur.close()
+        conn.close()
 
     
-    phi = {}
-    phi['S'] = input("Enter selection conditions (S, comma-separated characters): ").split(',')
-    phi['N'] = list(map(int, input("Enter number of grouping variables (N, comma-separated integers): ").split(',')))
-    phi['V'] = input("Enter group by attributes (V, comma-separated characters): ").split(',')
-    phi['F'] = input("Enter aggregate functions (F, comma-separated characters): ").split(',')
-    phi['sigma'] = input("Enter Conditions in such that (sigma, comma-separated characters): ").split(',')
-
-
-
-    
-"""
+    """
 
 
     # Note: The f allows formatting with variables.
