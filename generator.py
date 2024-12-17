@@ -11,7 +11,27 @@ def main():
     """
 
     body = """
+    import pandas as pd
+    import numpy as np
     from collections import defaultdict
+
+
+    query = "SELECT * FROM Sales;"  # Replace 'Sales' with your table name
+    df = pd.read_sql_query(query, con=cur.connection)
+    column_name = "quant"  # Replace 'quantity' with your column name
+
+    # Step 3: Calculate aggregate functions
+    min_value = int(df[column_name].min())
+    max_value = int(df[column_name].max())
+    avg_value = int(df[column_name].mean())
+    sum_value = int(df[column_name].sum())
+    count_value = int(df[column_name].count())
+
+    
+
+    # Step 4: Prepare results for display
+    
+    print(avg_value) 
 
     def process_scans(cur):
     
@@ -21,7 +41,7 @@ def main():
         S = input("Enter SELECT statement columns (comma-separated): ").split(',')
         S = [col.strip() for col in S]
 
-        #n = int(input("Enter the number of grouping variables (n): "))
+        n= int(input("Enter the number of grouping variables (n): "))
 
         V = input("Enter GROUP BY attributes (comma-separated): ").split(',')
         V = [col.strip() for col in V]
@@ -42,35 +62,26 @@ def main():
         query_string = f"SELECT DISTINCT {column_string} FROM sales"    
 
         
+    
+        
         try:
             # Step 2: Execute a SELECT query to fetch all rows (tuples) from the Sales table
             cur.execute(query_string)
-            rows = cur.fetchall()  # Fetch all tuples
+            rows = cur.fetchall()
 
             # Step 3: Loop over each tuple t in the result
             print("Looping over each tuple in the Sales table:")
             for t in rows:
-                if t['prod'] == 'Apple' and t['month'] == 3:
-                    #print("Condition satisfied for product A and month 1")
-                    # Access tuple values using column names or indices
-                    #print(f"Product: {t['prod']}, Month: {t['month']}, Year: {t['year']}, Quantity: {t['quant']}")
-            # Example: Check condition (defining condition of grouping variable X)
-                    _global.append(t)
-                
-                    
-                # Perform aggregate updates here (e.g., sum or count)
+                # Ensure t['quant'] is not a list, extract its value if needed
+                quant_value = t['quant']
+                if isinstance(quant_value, list):  # If 'quant' is a list, take the first element
+                    quant_value = quant_value[0]
+
+                if quant_value > avg_value and t['month'] == 3:
+                    _global.append(t)  # Append row to global list if condition is satisfied
 
         except Exception as e:
             print(f"An error occurred: {e}")
-        #Execute the query
-            #cur.execute(query_string)
-            # rows = cur.fetchall()
-
-            # Store all rows in _global
-            #_global.extend(rows)
-
-        #except psycopg2.Error as e:
-         #   print("An error occurred while executing the query:", e)
 
         finally:
             # Ensure the cursor and connection are closed
@@ -82,8 +93,7 @@ def main():
         #print("Fetching data from the table...")
         #cur.execute("SELECT * FROM sales")
         #rows = cur.fetchall()
-
-        print(F)                   
+          
     process_scans(cur)
     """
 
