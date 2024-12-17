@@ -11,51 +11,92 @@ def main():
     """
 
     body = """
+    from collections import defaultdict
 
-    S = input("Enter elements separated by commas: ").split(',')
-    S = [col.strip() for col in S]
-    print(S)  
-
-    #n = int(input("Enter number of grouping variables:"))
-    #print(n)
-
-    #V = input("Enter group by attributes:")
-    #V = V.split(',')  
-    #print(V)
-
-    #F = input("Enter aggregate functions")
-    #F = F.split(',')  
-    #print(F)  
-
-    #sig = input("Enter Such that phrases")
-    #sig = sig.split(',')  
-    #print(sig)  
-
-    #G = input("Enter having clause phrases or enter none if you dont have any: ")
-    #G = G.split(',')  
-    #print(G)  
+    def process_scans(cur):
     
- # Construct the dynamic SQL query
-    column_string = ", ".join(S)  # Format as "col1, col2, col3"
-    query_string = f"SELECT {column_string} FROM sales"
-
-    try:
-        # Execute the query
-        cur.execute(query_string)
-        rows = cur.fetchall()
-
-        # Store all rows in _global
-        _global.extend(rows)
-
-    except psycopg2.Error as e:
-        print("An error occurred while executing the query:", e)
-
-    finally:
-        # Ensure the cursor and connection are closed
-        cur.close()
-        conn.close()
-
     
+    
+        # Step 1: Prompt the user for values of S, n, V, F, sigma
+        S = input("Enter SELECT statement columns (comma-separated): ").split(',')
+        S = [col.strip() for col in S]
+
+        #n = int(input("Enter the number of grouping variables (n): "))
+
+        V = input("Enter GROUP BY attributes (comma-separated): ").split(',')
+        V = [col.strip() for col in V]
+
+       # F = input("Enter aggregate functions (comma-separated, e.g., sum(X.quantity)): ").split(',')
+       # F = [func.strip() for func in F]
+
+       # sigma = input("Enter 'such that' conditions (comma-separated): ").split(',')
+       # sigma = [cond.strip() for cond in sigma]
+        #sigma = []
+        #print("Enter conditions for each grouping variable in the 'such that' clause:")
+        #for i in range(1, n + 1):
+         #   condition = input(f"Condition for grouping variable {i}: ").strip()
+          #  sigma.append(condition)
+
+        column_string = ", ".join(V)  # Format as "col1, col2, col3"
+        query_string = f"SELECT DISTINCT {column_string} FROM sales"
+
+        try:
+            # Execute the query
+            cur.execute(query_string)
+            rows = cur.fetchall()
+
+            # Store all rows in _global
+            _global.extend(rows)
+
+        except psycopg2.Error as e:
+            print("An error occurred while executing the query:", e)
+
+        finally:
+            # Ensure the cursor and connection are closed
+            cur.close()
+            conn.close()
+                            ###### Till this point, the code takes inputs given in V for printing the table. 
+                            ###### Everything after this, is me trying to figure out how to check for conditions and it hasn't work yet. 
+                            ###### Feel free to remove the code below if you want.
+                            ###### I have also commented out some of the input variables like sigma, F, n because it was becoming a pain to put those values everytime.
+                            
+        #results = defaultdict(lambda: defaultdict(float))
+            
+        #print("Fetching data from the table...")
+        #cur.execute("SELECT * FROM sales")
+        #rows = cur.fetchall()
+#
+ #       print("Processing rows to evaluate 'such that' conditions...")
+  #      for row in rows:
+   #         for idx, condition in enumerate(sigma):
+    #            try:
+     #               if eval(condition, {}, row):  # Dynamically check the condition
+      #                  for func in F:
+       #                     if func.startswith("sum"):
+        #                        col = func.split("(")[1].split(")")[0]  # Extract column name
+         #                       results[idx][func] += row[col]
+          #                  elif func.startswith("avg"):
+           #                     col = func.split("(")[1].split(")")[0]
+            #                    results[idx]['sum_' + col] += row[col]
+             #                   results[idx]['count_' + col] += 1
+              #  except Exception as e:
+               #     print(f"Error evaluating condition '{condition}': {e}")
+#
+#
+ #       for idx, funcs in results.items():
+  #      for func in F:
+   #         if func.startswith("avg"):
+    #            col = func.split("(")[1].split(")")[0]
+     #           results[idx][func] = funcs['sum_' + col] / funcs['count_' + col]
+#
+ #       print("Final Aggregate Values Satisfying 'Such That' Conditions:")
+  #      final_results = []
+   #     for idx, funcs in results.items():
+    #    row = {'Condition Index': idx + 1}
+     #   row.update(funcs)
+      #  final_results.append(row)
+                        
+    process_scans(cur)
     """
 
 
