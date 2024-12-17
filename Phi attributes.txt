@@ -1,0 +1,6 @@
+S = prod, month, year, sum(X.quantity)/sum(Y.quantity)
+n = 2
+V = prod, month, year
+F = sum(X.quant), sum(Y.quant)
+sigma = row['prod'] == entry['grouping_values']['prod'] and row['month'] == entry['grouping_values']['month'] and row['year'] == entry['grouping_values']['year']
+sigma = row['prod'] == entry['grouping_values']['prod'] and row['year'] == entry['grouping_values']['year']
