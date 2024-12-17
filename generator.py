@@ -21,16 +21,17 @@ def main():
         S = input("Enter SELECT statement columns (comma-separated): ").split(',')
         S = [col.strip() for col in S]
 
-        #n = int(input("Enter the number of grouping variables (n): "))
+        n = int(input("Enter the number of grouping variables (n): "))
 
         V = input("Enter GROUP BY attributes (comma-separated): ").split(',')
         V = [col.strip() for col in V]
 
-       # F = input("Enter aggregate functions (comma-separated, e.g., sum(X.quantity)): ").split(',')
-       # F = [func.strip() for func in F]
+        F = input("Enter aggregate functions (comma-separated, e.g., sum(X.quantity)): ").split(',')
+        F = [func.strip() for func in F]
+        
 
-       # sigma = input("Enter 'such that' conditions (comma-separated): ").split(',')
-       # sigma = [cond.strip() for cond in sigma]
+        #sigma = input("Enter 'such that' conditions (comma-separated): ").split(',')
+        #sigma = [cond.strip() for cond in sigma]
         #sigma = []
         #print("Enter conditions for each grouping variable in the 'such that' clause:")
         #for i in range(1, n + 1):
@@ -38,64 +39,50 @@ def main():
           #  sigma.append(condition)
 
         column_string = ", ".join(V)  # Format as "col1, col2, col3"
-        query_string = f"SELECT DISTINCT {column_string} FROM sales"
+        query_string = f"SELECT DISTINCT {column_string} FROM sales"    
 
+        
         try:
-            # Execute the query
-            cur.execute(query_string)
-            rows = cur.fetchall()
+            # Step 2: Execute a SELECT query to fetch all rows (tuples) from the Sales table
+            cur.execute("SELECT * FROM Sales")
+            rows = cur.fetchall()  # Fetch all tuples
+
+            # Step 3: Loop over each tuple t in the result
+            print("Looping over each tuple in the Sales table:")
+            for t in rows:
+                if t['prod'] == 'Apple' and t['month'] == 3:
+                    #print("Condition satisfied for product A and month 1")
+                    # Access tuple values using column names or indices
+                    #print(f"Product: {t['prod']}, Month: {t['month']}, Year: {t['year']}, Quantity: {t['quant']}")
+            # Example: Check condition (defining condition of grouping variable X)
+                    _global.append(t)
+                
+                # Perform aggregate updates here (e.g., sum or count)
+
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        #Execute the query
+            #cur.execute(query_string)
+            # rows = cur.fetchall()
 
             # Store all rows in _global
-            _global.extend(rows)
+            #_global.extend(rows)
 
-        except psycopg2.Error as e:
-            print("An error occurred while executing the query:", e)
+        #except psycopg2.Error as e:
+         #   print("An error occurred while executing the query:", e)
 
         finally:
             # Ensure the cursor and connection are closed
             cur.close()
             conn.close()
-                            ###### Till this point, the code takes inputs given in V for printing the table. 
-                            ###### Everything after this, is me trying to figure out how to check for conditions and it hasn't work yet. 
-                            ###### Feel free to remove the code below if you want.
-                            ###### I have also commented out some of the input variables like sigma, F, n because it was becoming a pain to put those values everytime.
-                            
+
         #results = defaultdict(lambda: defaultdict(float))
             
         #print("Fetching data from the table...")
         #cur.execute("SELECT * FROM sales")
         #rows = cur.fetchall()
-#
- #       print("Processing rows to evaluate 'such that' conditions...")
-  #      for row in rows:
-   #         for idx, condition in enumerate(sigma):
-    #            try:
-     #               if eval(condition, {}, row):  # Dynamically check the condition
-      #                  for func in F:
-       #                     if func.startswith("sum"):
-        #                        col = func.split("(")[1].split(")")[0]  # Extract column name
-         #                       results[idx][func] += row[col]
-          #                  elif func.startswith("avg"):
-           #                     col = func.split("(")[1].split(")")[0]
-            #                    results[idx]['sum_' + col] += row[col]
-             #                   results[idx]['count_' + col] += 1
-              #  except Exception as e:
-               #     print(f"Error evaluating condition '{condition}': {e}")
-#
-#
- #       for idx, funcs in results.items():
-  #      for func in F:
-   #         if func.startswith("avg"):
-    #            col = func.split("(")[1].split(")")[0]
-     #           results[idx][func] = funcs['sum_' + col] / funcs['count_' + col]
-#
- #       print("Final Aggregate Values Satisfying 'Such That' Conditions:")
-  #      final_results = []
-   #     for idx, funcs in results.items():
-    #    row = {'Condition Index': idx + 1}
-     #   row.update(funcs)
-      #  final_results.append(row)
-                        
+
+        print(F)                   
     process_scans(cur)
     """
 
