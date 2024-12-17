@@ -21,7 +21,7 @@ def main():
         S = input("Enter SELECT statement columns (comma-separated): ").split(',')
         S = [col.strip() for col in S]
 
-        n = int(input("Enter the number of grouping variables (n): "))
+        #n = int(input("Enter the number of grouping variables (n): "))
 
         V = input("Enter GROUP BY attributes (comma-separated): ").split(',')
         V = [col.strip() for col in V]
@@ -44,7 +44,7 @@ def main():
         
         try:
             # Step 2: Execute a SELECT query to fetch all rows (tuples) from the Sales table
-            cur.execute("SELECT * FROM Sales")
+            cur.execute(query_string)
             rows = cur.fetchall()  # Fetch all tuples
 
             # Step 3: Loop over each tuple t in the result
@@ -57,6 +57,7 @@ def main():
             # Example: Check condition (defining condition of grouping variable X)
                     _global.append(t)
                 
+                    
                 # Perform aggregate updates here (e.g., sum or count)
 
         except Exception as e:
